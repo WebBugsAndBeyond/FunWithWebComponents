@@ -1,0 +1,205 @@
+<style>
+    :host {
+        --cube-xaxis: 0;
+        --cube-yaxis: 0;
+        --cube-zaxis: 0;
+        --cube-angle: 0deg;
+        --container-width: 700px;
+        --container-height: 700px;
+        --cube-face-name: 'front';
+        --cube-perspective: 2000px;
+        --visible-face-opacity: 0.8;
+        --not-visible-face-opacity: 0.1;
+        display: flex;
+    }
+    :host div {
+        box-sizing: border-box;
+    }
+
+    .container {
+        width: var(--container-width);
+        height: var(--container-height);
+        /*border: 1px solid lightgray;*/
+        /*border-radius: 4px;*/
+        /*background: #0a0a0a;*/
+        position: relative;
+        margin: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .cube-container {
+        width: var(--container-width);
+        height: var(--container-height);
+        perspective: var(--cube-perspective);
+        transition: perspective 0.3s ease-out;
+    }
+    .cube {
+        width: var(--container-width);
+        height: var(--container-height);
+        font-family: sans-serif;
+        transform-style: preserve-3d;
+        transition: transform 1s ease-in-out;
+        transform: rotate3d(var(--cube-xaxis), var(--cube-yaxis), var(--cube-zaxis), var(--cube-angle));
+        /*animation: all-axis-rotate 20s infinite linear;*/
+    }
+    .cube--waiting-animation {
+        animation: all-axis-rotate 20s infinite linear;
+    }
+
+    .cube--flicker-phase-1 {
+        transition: opacity 0.5s ease-in-out;
+        animation: flicker-face 1s infinite linear;
+    }
+    .cube--flicker-phase-2 {
+        transition: opacity 350ms ease-in-out;
+        animation: flicker-face 700ms infinite linear;
+    }
+    .cube--flicker-phase-3 {
+        transition: opacity 250ms ease-in-out;
+        animation: flicker-face 500ms infinite linear;
+    }
+
+    .face {
+        width: var(--container-width);
+        height: var(--container-height);
+        position: absolute;
+        border: none;
+        color: #fff;
+        font-size: 6em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: var(--not-visible-face-opacity);
+        transition: opacity 0.3s ease-out;
+        transform-origin: center;
+        background-color: rgba(10, 10, 10, 0.5);
+        backface-visibility: visible;
+    }
+    .face > * {
+        opacity: 0;
+    }
+    .front {
+        transform: rotateY(0deg) translateZ(calc(var(--container-width) / 2));
+    }
+    .right {
+        transform: rotateY(90deg) translateZ(calc(var(--container-width) / 2));
+    }
+    .left {
+        transform: rotateY(-90deg) translateZ(calc(var(--container-width) / 2));
+    }
+    .back {
+        transform: rotateY(180deg) translateZ(calc(var(--container-width) / 2));
+    }
+    .top {
+        transform: rotateX(90deg) translateZ(calc(var(--container-width) / 2));
+    }
+    .bottom {
+        transform: rotateX(-90deg) translateZ(calc(var(--container-width) / 2));
+    }
+
+    :host([visible-face="front"]) .cube {
+        transform: rotate3d(0, 0, 0, 0deg);
+    }
+    :host([visible-face="front"]) .front {
+        opacity: var(--visible-face-opacity);
+    }
+    :host([visible-face="front"]) .front > * {
+        opacity: var(--visible-face-opacity);
+    }
+
+    :host([visible-face="back"]) .cube {
+        transform: rotate3d(0, 1, 0, 180deg);
+    }
+    :host([visible-face="back"]) .back {
+        opacity: var(--visible-face-opacity);
+    }
+    :host([visible-face="back"]) .back > * {
+        opacity: var(--visible-face-opacity);
+    }
+
+    :host([visible-face="left"]) .cube {
+        transform: rotate3d(0, 1, 0, 90deg);
+    }
+    :host([visible-face="left"]) .left {
+        opacity: var(--visible-face-opacity);
+    }
+    :host([visible-face="left"]) .left {
+        opacity: var(--visible-face-opacity);
+    }
+
+    :host([visible-face="right"]) .cube {
+        transform: rotate3d(0, 1, 0, -90deg);
+    }
+    :host([visible-face="right"]) .right {
+        opacity: var(--visible-face-opacity);
+    }
+    :host([visible-face="right"]) .right > * {
+        opacity: var(--visible-face-opacity);
+    }
+
+    :host([visible-face="top"]) .cube{
+        transform: rotate3d(-1, 0, 0, 90deg);
+    }
+    :host([visible-face="top"]) .top {
+        opacity: var(--visible-face-opacity);
+    }
+    :host([visible-face="top"]) .top > * {
+        opacity: var(--visible-face-opacity);
+    }
+
+    :host([visible-face="bottom"]) .cube {
+        transform: rotate3d(1, 0, 0, 90deg);
+    }
+    :host([visible-face="bottom"]) .bottom {
+        opacity: var(--visible-face-opacity);
+    }
+    :host([visible-face="bottom"]) .bottom > * {
+        opacity: var(--visible-face-opacity);
+    }
+
+    @keyframes all-axis-rotate {
+        from {
+            transform: rotate3d(0, 0, 0, 0deg);
+        }
+        to {
+            transform: rotate3d(1, 1, 1, 360deg);
+        }
+    }
+
+    @keyframes flicker-face {
+        0% {
+            opacity: var(--visible-face-opacity);
+        }
+        50% {
+            opacity: var(--not-visible-face-opacity);
+        }
+        100% {
+            opacity: var(--visible-face-opacity)
+        }
+    }
+</style>
+<div class="container">
+    <div class="cube-container">
+        <div class="cube">
+            <div class="face front">
+                <slot name="front-face">1</slot>
+            </div>
+            <div class="face right">
+                <slot name="right-face">2</slot>
+            </div>
+            <div class="face left">
+                <slot name="left-face">3</slot>
+            </div>
+            <div class="face back">
+                <slot name="back-face">4</slot>
+            </div>
+            <div class="face top">
+                <slot name="top-face">5</slot>
+            </div>
+            <div class="face bottom">
+                <slot name="bottom-face">6</slot>
+            </div>
+        </div>
+    </div>
+</div>

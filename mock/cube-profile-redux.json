@@ -1,0 +1,98 @@
+{
+  "front-face": {
+    "header": "<h1>Cube Content Front</h1>",
+    "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dictum, nulla id tempor congue, eros lacus tempor magna, ut faucibus sem nisi sit amet neque. Donec viverra sit amet leo sit amet finibus. Integer quis lectus ut nunc sollicitudin tincidunt. Suspendisse ante nisl, facilisis sit amet arcu eu, pharetra fringilla. </p>",
+    "aside": {
+      "list": [{
+        "url": "javascript:void(0);",
+        "text": "Foo"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Bar"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Baz"
+      }]
+    }
+  },
+  "back-face": {
+    "header": "<h1>Cube Content Back</h1>",
+    "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dictum, nulla id tempor congue, eros lacus tempor magna, ut faucibus sem nisi sit amet neque. Donec viverra sit amet leo sit amet finibus. Integer quis lectus ut nunc sollicitudin tincidunt. Suspendisse ante nisl, facilisis sit amet arcu eu, pharetra fringilla. </p>",
+    "aside": {
+      "list": [{
+        "url": "javascript:void(0);",
+        "text": "Foo"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Bar"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Baz"
+      }]
+    }
+  },
+  "right-face": {
+    "header": "<h1>Cube Content Right</h1>",
+    "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dictum, nulla id tempor congue, eros lacus tempor magna, ut faucibus sem nisi sit amet neque. Donec viverra sit amet leo sit amet finibus. Integer quis lectus ut nunc sollicitudin tincidunt. Suspendisse ante nisl, facilisis sit amet arcu eu, pharetra fringilla. </p>",
+    "aside": {
+      "list": [{
+        "url": "javascript:void(0);",
+        "text": "Foo"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Bar"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Baz"
+      }]
+    }
+  },
+  "left-face": {
+    "header": "<h1>Cube Content Left</h1>",
+    "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dictum, nulla id tempor congue, eros lacus tempor magna, ut faucibus sem nisi sit amet neque. Donec viverra sit amet leo sit amet finibus. Integer quis lectus ut nunc sollicitudin tincidunt. Suspendisse ante nisl, facilisis sit amet arcu eu, pharetra fringilla. </p>",
+    "aside": {
+      "list": [{
+        "url": "javascript:void(0);",
+        "text": "Foo"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Bar"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Baz"
+      }]
+    }
+  },
+  "top-face": {
+    "header": "<h1>Cube Content Top</h1>",
+    "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dictum, nulla id tempor congue, eros lacus tempor magna, ut faucibus sem nisi sit amet neque. Donec viverra sit amet leo sit amet finibus. Integer quis lectus ut nunc sollicitudin tincidunt. Suspendisse ante nisl, facilisis sit amet arcu eu, pharetra fringilla. </p>",
+    "aside": {
+      "list": [{
+        "url": "javascript:void(0);",
+        "text": "Foo"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Bar"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Baz"
+      }]
+    }
+  },
+  "bottom-face": {
+    "header": "<h1>Cube Content Bottom</h1>",
+    "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dictum, nulla id tempor congue, eros lacus tempor magna, ut faucibus sem nisi sit amet neque. Donec viverra sit amet leo sit amet finibus. Integer quis lectus ut nunc sollicitudin tincidunt. Suspendisse ante nisl, facilisis sit amet arcu eu, pharetra fringilla. </p>",
+    "aside": {
+      "list": [{
+        "url": "javascript:void(0);",
+        "text": "Foo"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Bar"
+      }, {
+        "url": "javascript:void(0);",
+        "text": "Baz"
+      }]
+    }
+  }
+}

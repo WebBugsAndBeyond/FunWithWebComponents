@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fun With Web Components - Rotating Knob</title>
+    <style>
+
+        main {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-width: 100vw;
+            justify-content: flex-start;
+            align-items: start;
+            gap: 16px;
+        }
+    </style>
+</head>
+<body>
+    <template id="rotating-knob-template">
+        <style>
+            :host {
+                --container-width: 160px;
+                --container-height: 160px;
+                --knob-width: 100px;
+                --knob-height: 100px;
+                --knob-left: calc(var(--container-width) / 2 - var(--knob-width) / 2);
+                --knob-top: calc(var(--container-height) / 2 - var(--knob-height) / 2);
+                --knob-bg-color: lightgray;
+                --knob-fg-color: linear-gradient(135deg, rgba(166, 166, 166, 1) 0%, rgba(200, 200, 200, 1) 100%);
+                --knob-edge-color: rgba(0, 0, 0, 0.5);
+                --knob-bg-color-hover: white;
+                --knob-shadow-color: #a3a3a3;
+                --knob-shadow-x: 5px;
+                --knob-shadow-y: 5px;
+                --knob-shadow-distance: 5px;
+                --ticks-radius: -70px;
+                font-family: 'Arial', sans-serif;
+                font-size: 16px;
+            }
+            :host, div {
+                box-sizing: border-box;
+                position: relative;
+            }
+            .knob__container {
+                background-color: var(--knob-bg-color);
+                width: var(--container-width);
+                height: var(--container-height);
+                position: relative;
+                border-style: solid;
+                border-width: 1px;
+                border-color: var(--knob-edge-color);
+            }
+            .knob__knob {
+                border-radius: 50%;
+                width: var(--knob-width);
+                height: var(--knob-height);
+                border-color: var(--knob-edge-color);
+                background: var(--knob-fg-color);
+                box-shadow: var(--knob-shadow-color) var(--knob-shadow-x) var(--knob-shadow-y) var(--knob-shadow-distance);
+                position: absolute;
+                left: var(--knob-left);
+                top: var(--knob-top);
+                border-width: 1px;
+                border-style: solid;
+            }
+            .knob__value-pointer {
+                background-color: var(--knob-edge-color);
+                width: 2px;
+                border-radius: 50%;
+                height: calc(var(--knob-height) / 2);
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform-origin: 50% 100%;
+                transform: translate(-50%, -100%) rotate(-135deg);
+                transition: transform 120ms linear;
+            }
+            #value-label {
+                position: absolute;
+                top: auto;
+                bottom: 0;
+                height: 32px;
+                font-size: 16px;
+                line-height: 32px;
+                width: 100%;
+                left: 0;
+                text-align: center;
+            }
+            .knob__ticks {
+                position: absolute;
+                inset: 0;
+            }
+            .knob__tick {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 1px;
+                height: 10px;
+                background-color: var(--knob-edge-color);
+                visibility: hidden;
+            }
+            .knob__tick--0 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(-135deg) translate(4px, var(--ticks-radius));
+            }
+            .knob__tick--10 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(-108deg) translate(4px, var(--ticks-radius));
+
+            }
+            .knob__tick--20 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(-81deg) translate(4px, var(--ticks-radius));
+            }
+            .knob__tick--30 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(-54deg) translate(4px, var(--ticks-radius));
+            }
+            .knob__tick--40 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(-27deg) translate(2px, var(--ticks-radius));
+            }
+            .knob__tick--50 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(0deg) translate(0px, var(--ticks-radius));
+            }
+            .knob__tick--60 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(27deg) translate(0px, var(--ticks-radius));
+            }
+            .knob__tick--70 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(54deg) translate(-2px, var(--ticks-radius));
+            }
+            .knob__tick--80 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(81deg) translate(-4px, var(--ticks-radius));
+            }
+            .knob__tick--90 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(108deg) translate(-4px, var(--ticks-radius));
+            }
+            .knob__tick--100 {
+                visibility: visible;
+                border-width: 0;
+                border-style: solid;
+                transform: rotate(135deg) translate(-4px, var(--ticks-radius));
+            }
+        </style>
+        <div tabindex="0" class="knob__container knob--rotating">
+            <div class="knob__knob"
+                 role="slider"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 aria-valuenow="0"
+                 aria-labelledby="value-label"
+                 part="knob"
+            >
+                <div class="knob__value-pointer"></div>
+            </div>
+            <div class="knob__ticks">
+                <div class="knob__tick knob__tick--0"></div>
+                <div class="knob__tick knob__tick--10"></div>
+                <div class="knob__tick knob__tick--20"></div>
+                <div class="knob__tick knob__tick--30"></div>
+                <div class="knob__tick knob__tick--40"></div>
+                <div class="knob__tick knob__tick--50"></div>
+                <div class="knob__tick knob__tick--60"></div>
+                <div class="knob__tick knob__tick--70"></div>
+                <div class="knob__tick knob__tick--80"></div>
+                <div class="knob__tick knob__tick--90"></div>
+                <div class="knob__tick knob__tick--100"></div>
+            </div>
+        </div>
+        <div class="knob__label" id="value-label" part="label">0</div>
+    </template>
+    <main></main>
+    <script>
+        if (
+            !Object.hasOwn(window, 'FunWithWebComponents') ||
+            typeof(window['FunWithWebComponents']) !== 'object' ||
+            window['FunWithWebComponents'] === null
+        ) {
+            window['FunWithWebComponents'] = {};
+        }
+    </script>
+    <script src="js/utils.js"></script>
+    <script>
+        const { utils : { types : { AccessibleSliderBaseElement } } } = window.FunWithWebComponents;
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            class RotatingKnobElement extends AccessibleSliderBaseElement {
+
+                constructor(templateId = 'rotating-knob-template') {
+                    super(templateId);
+                }
+
+                static get observedAttributes() {
+                    return ['value', 'minValue', 'maxValue', 'pageSize', 'label'];
+                }
+
+                onMouseMove(event) {
+                    if (!this.isMouseDown) {
+                        return;
+                    }
+                    window.FunWithWebComponents.utils.event.ensureEventIsOnlyHandledOnce(event);
+                    const { mousePosition, value, pageSize, minValue, maxValue } = this;
+                    const mouseX = event.clientX;
+                    const mouseY = event.clientY;
+                    const moveDistance = (mousePosition?.y ?? mouseY) - mouseY;
+                    if (moveDistance > 0) {
+                        const newValue = Math.min(value + pageSize, maxValue);
+                        console.log(`Increasing value ${newValue}`);
+                        this.value = newValue;
+                    } else if (moveDistance < 0) {
+                        const newValue = Math.max(minValue, value - pageSize);
+                        console.log(`Decreasing value ${newValue}`);
+                        this.value = newValue;
+                    } else {
+                        return;
+                    }
+                    this.updateMouseMoveCoordinates(mouseX, mouseY);
+                    this.selfSetAttribute('value', this.value);
+                    this.updateUIValueDisplay();
+                }
+
+                updateUIValueDisplay() {
+                    if (!this.isConnected) {
+                        return;
+                    }
+                    const knobElement = this.shadowRoot.querySelector('.knob__value-pointer');
+                    if (knobElement) {
+                        const steps = 135 * 2 / 100;
+                        const rotation = this.value * steps - 135;
+                        knobElement.style.transform = `translate(-50%, -100%) rotate(${rotation}deg)`;
+                        knobElement.setAttribute('aria-valuenow', `${this.value}`);
+                    }
+                }
+            }
+
+            window.customElements.define('rotating-knob', RotatingKnobElement);
+
+            Promise.all([
+                window.customElements.whenDefined('rotating-knob'),
+            ]).then(elementConstructors => {
+                const mainElement = document.querySelector('main');
+                if (mainElement) {
+                    const knobElement = document.createElement('rotating-knob');
+                    mainElement.appendChild(knobElement);
+                    knobElement.setAttribute('label', 'Bass');
+
+                    const inputElement = document.createElement('input');
+                    inputElement.setAttribute('type', 'number');
+                    inputElement.setAttribute('min', '0');
+                    inputElement.setAttribute('max', '100');
+                    inputElement.setAttribute('step', '1');
+                    inputElement.setAttribute('size', 3);
+                    inputElement.addEventListener('input', (event) => {
+                       const target = event.target;
+                       const value = target.value;
+                       if (!isNaN(value) && Number(value) !== knobElement.value) {
+                            knobElement.setAttribute('value', value);
+                       }
+                    });
+                    mainElement.appendChild(inputElement);
+                    knobElement.addEventListener('slidervaluechange', (event) => {
+                       const { detail : { value } } = event;
+                       if (value !== inputElement.value) {
+                           inputElement.value = value;
+                       }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

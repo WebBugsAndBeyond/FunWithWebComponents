@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="initial-zoom=1">
+    <meta charset="UTF-8">
+    <title>Fun With Web Components - 3D Cube Redux</title>
+    <style>
+
+        :root {
+            --cube-xaxis: 0;
+            --cube-yaxis: 0;
+            --cube-zaxis: 0;
+            --cube-angle: 0deg;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .container {
+            min-width: 500px;
+            height: 500px;
+            border: 5px solid lightgray;
+            background: #0a0a0a;
+            position: relative;
+            margin: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .cube-container {
+            width: 250px;
+            height: 250px;
+            perspective: 500px;
+        }
+        .cube {
+            width: 100%;
+            height: 100%;
+            font-family: sans-serif;
+            transform-style: preserve-3d;
+            transition: transform 1s ease-in-out;
+        }
+        .face {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            border: 3px solid #c8c8c8;
+            color: #fff;
+            font-size: 6em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .front {
+            transform: rotateY(0deg) translateZ(calc(250px / 2));
+        }
+        .right {
+            transform: rotateY(90deg) translateZ(calc(250px / 2));
+        }
+        .left {
+            transform: rotateY(-90deg) translateZ(calc(250px / 2));
+        }
+        .back {
+            transform: rotateY(180deg) translateZ(calc(250px / 2));
+        }
+        .top {
+            transform: rotateX(90deg) translateZ(calc(250px / 2));
+        }
+        .bottom {
+            transform: rotateX(-90deg) translateZ(calc(250px / 2));
+        }
+        .cube-1 {
+            transform: rotate3d(var(--cube-xaxis), var(--cube-yaxis). var(--cube-zaxis), var(--cube-angle));
+        }
+        .cube-2 {
+            transform: rotate3d(var(--cube-xaxis), 0, 0, var(--cube-angle));
+        }
+        .example-2 {
+            background-color: #6a4ff87f;
+        }
+        .cube-3 {
+            transform: rotate3d(0, 0, 1, 290deg);
+        }
+        .example-3 {
+            background-color: #fab3677f;
+        }
+
+        .cube-4 {
+            transform: rotate3d(-1, 1, 0, 65deg);
+        }
+        .example-4 {
+            background-color: #0df5d37f;
+        }
+
+        @keyframes x-axis-rotate {
+            from {
+                transform: rotate3d(0, 0, 0, 0deg);
+            }
+            to {
+                transform: rotate3d(1, 0, 0, 360deg);
+            }
+        }
+
+        @keyframes y-axis-rotate {
+            from {
+                transform: rotate3d(0, 0, 0, 0deg);
+            }
+            to {
+                transform: rotate3d(0, 1, 0, 360deg);
+            }
+        }
+        @keyframes z-axis-rotate {
+            from {
+                transform: rotate3d(0, 0, 0, 0deg);
+            }
+            to {
+                transform: rotate3d(0, 0, 1, 360deg);
+            }
+        }
+        @keyframes all-axis-rotate {
+            from {
+                transform: rotate3d(0, 0, -1, -290deg);
+            }
+            to {
+                transform: rotate3d(0, 0, 1, 290deg);
+            }
+        }
+
+        .cube.x-axis {
+            animation: x-axis-rotate 2s ease-in-out 1;
+        }
+        .cube.y-axis {
+            animation: y-axis-rotate 2s ease-in-out 1;
+        }
+        .cube.z-axis {
+            animation: z-axis-rotate 2s ease-in-out 1;
+        }
+        .cube-with-input {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            height: 600px;
+            width: 500px;
+        }
+        .cube-input {
+            height: 100px;
+            width: 500px;
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            flex-wrap: wrap;
+        }
+        .cube-input > .cube-input__label {
+            flex-shrink: 0;
+            flex-grow: 1;
+            flex-basis: 100%;
+        }
+
+        .slider-input {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+            width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cube-with-input">
+        <cube-element></cube-element>
+        <div class="cube-input cube-input__rotation">
+            <div class="cube-input__label">Rotate Angles</div>
+            <div class="cube-input__xaxis">
+                <label for="cube-input-xaxis">X-Axis</label>
+                <input id="cube-input-xaxis" type="number" min="-360" max="360" value="0">
+            </div>
+            <div class="cube-input__yaxis">
+                <label for="cube-input-yaxis">Y-Axis</label>
+                <input id="cube-input-yaxis" type="number" min="-360" max="360" value="0">
+            </div>
+            <div class="cube-input__zaxis">
+                <label for="cube-input-zaxis">Z-Axis</label>
+                <input id="cube-input-zaxis" type="number" min="0" max="360" value="0">
+            </div>
+            <div class="cube-input__angle">
+                <label for="cube-input-angle">Angle</label>
+                <input id="cube-input-angle" type="number" min="-360" max="360" value="0">
+            </div>
+        </div>
+        <div class="cube-input cube-input__face-selection">
+            <div class="cube-input__label">Face Selector</div>
+            <div class="cube-input__radio">
+                <input type="radio" name="face" id="cube-input-front" checked value="front">
+                <label for="cube-input-front">Front</label>
+            </div>
+            <div class="cube-input__radio">
+                <input type="radio" name="face" id="cube-input-back" value="back">
+                <label for="cube-input-back">Back</label>
+            </div>
+            <div class="cube-input__radio">
+                <input type="radio" name="face" id="cube-input-left" value="left">
+                <label for="cube-input-left">Left</label>
+            </div>
+            <div class="cube-input__radio">
+                <input type="radio" name="face" id="cube-input-right" value="right">
+                <label for="cube-input-right">Right</label>
+            </div>
+            <div class="cube-input__radio">
+                <input type="radio" name="face" id="cube-input-bottom" value="bottom">
+                <label for="cube-input-bottom">Bottom</label>
+            </div>
+            <div class="cube-input__radio">
+                <input type="radio" name="face" id="cube-input-top" value="top">
+                <label for="cube-input-top">Top</label>
+            </div>
+        </div>
+    </div>
+    <div class="slider-input">
+        <slider-component orientation="vertical" minvalue="0" maxvalue="100" value="50" label="Perspective" pagesize="5"></slider-component>
+    </div>
+    <template id="cube-element-template">
+        <style>
+            :host {
+                --cube-xaxis: 0;
+                --cube-yaxis: 0;
+                --cube-zaxis: 0;
+                --cube-angle: 0deg;
+                --container-width: 500px;
+                --container-height: 500px;
+                --cube-face-name: 'front';
+                --cube-perspective: 250px;
+            }
+            :host div {
+                box-sizing: border-box;
+            }
+
+            .container {
+                min-width: var(--container-width);
+                height: var(--container-height);
+                border: 5px solid lightgray;
+                background: #0a0a0a;
+                position: relative;
+                margin: 5px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .cube-container {
+                width: calc(var(--container-width) / 2);
+                height: calc(var(--container-height) / 2);
+                perspective: var(--cube-perspective);
+                transition: perspective 0.3s ease-out;
+            }
+            .cube {
+                width: 100%;
+                height: 100%;
+                font-family: sans-serif;
+                transform-style: preserve-3d;
+                transition: transform 1s ease-in-out;
+                transform: rotate3d(var(--cube-xaxis), var(--cube-yaxis), var(--cube-zaxis), var(--cube-angle));
+            }
+
+            .face {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                border: 3px solid #c8c8c8;
+                color: #fff;
+                font-size: 6em;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .front {
+                transform: rotateY(0deg) translateZ(calc(250px / 2));
+            }
+            .right {
+                transform: rotateY(90deg) translateZ(calc(250px / 2));
+            }
+            .left {
+                transform: rotateY(-90deg) translateZ(calc(250px / 2));
+            }
+            .back {
+                transform: rotateY(180deg) translateZ(calc(250px / 2));
+            }
+            .top {
+                transform: rotateX(90deg) translateZ(calc(250px / 2));
+            }
+            .bottom {
+                transform: rotateX(-90deg) translateZ(calc(250px / 2));
+            }
+
+            :host([visible-face="front"]) .cube {
+                transform: rotate3d(0, 0, 0, 0deg);
+            }
+            :host([visible-face="back"]) .cube {
+                transform: rotate3d(0, 1, 0, 180deg);
+            }
+            :host([visible-face="left"]) .cube {
+                transform: rotate3d(0, 1, 0, 90deg);
+            }
+            :host([visible-face="right"]) .cube{
+                transform: rotate3d(0, 1, 0, -90deg);
+            }
+            :host([visible-face="top"]) .cube{
+                transform: rotate3d(-1, 0, 0, 90deg);
+            }
+            :host([visible-face="bottom"]) .cube {
+                transform: rotate3d(1, 0, 0, 90deg);
+            }
+        </style>
+        <div class="container">
+            <div class="cube-container">
+                <div class="cube">
+                    <div class="face front">1</div>
+                    <div class="face right">2</div>
+                    <div class="face left">3</div>
+                    <div class="face back">4</div>
+                    <div class="face top">5</div>
+                    <div class="face bottom">6</div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <script>
+        if (
+            !Object.hasOwn(window, 'FunWithWebComponents') ||
+            typeof(window['FunWithWebComponents']) !== 'object' ||
+            window['FunWithWebComponents'] === null
+        ) {
+            window['FunWithWebComponents'] = {};
+        }
+    </script>
+    <script src="js/utils.js"></script>
+    <script src="/js/SliderComponentElement.js" type="module"></script>
+    <script src="/js/CubeElement.js" type="module"></script>
+    <script id="cube-element-script">
+        document.addEventListener("DOMContentLoaded", function () {
+           'use strict';
+
+           class CubeElement extends HTMLElement {
+               constructor() {
+                   super();
+                   const templateId = 'cube-element-template';
+                   const templateElement = document.getElementById(templateId);
+                   const templateContent = templateElement.content.cloneNode(true);
+                   const shadowRoot = this.attachShadow({ mode: 'open' });
+                   shadowRoot.appendChild(templateContent);
+               }
+
+               static get observedAttributes() {
+                   return ['size', 'perspective', 'xaxis', 'yaxis', 'zaxis', 'angle', 'visible-face'];
+               }
+
+               attributeChangedCallback(name, oldValue, newValue) {
+                   if (oldValue === newValue) {
+                       return;
+                   }
+                   if (name === 'size') {
+                       this.style.setProperty('--cube-width', newValue);
+                       this.style.setProperty('--cube-height', newValue);
+                   } else if (name === 'xaxis') {
+                        this.style.setProperty('--cube-xaxis', newValue);
+                   } else if (name === 'yaxis') {
+                       this.style.setProperty('--cube-yaxis', newValue);
+                   } else if (name === 'zaxis') {
+                       this.style.setProperty('--cube-zaxis', newValue);
+                   } else if (name === 'angle') {
+                       this.style.setProperty('--cube-angle', newValue);
+                   } else if (name === 'visible-face') {
+                       const validFaceNames = ['front', 'back', 'right', 'left', 'top', 'bottom'];
+                       if (!validFaceNames.includes(newValue)) {
+                           this.setAttribute('visible-face', oldValue);
+                       }
+                   } else if (name === 'perspective') {
+                       this.style.setProperty('--cube-perspective', `${newValue}`);
+                   }
+               }
+
+               connectedCallback() {
+                   const perspectiveAttributeValue = this.getAttribute('perspective');
+                   console.log('perspective attribute ', perspectiveAttributeValue);
+                   if (perspectiveAttributeValue === null) {
+                       const stylePerspectiveAttributeValue = getComputedStyle(this).getPropertyValue('--cube-perspective');
+                       console.log('style perspective value ', stylePerspectiveAttributeValue);
+                       this.setAttribute('perspective', stylePerspectiveAttributeValue);
+                   }
+               }
+           }
+
+           window.customElements.define('cube-element', CubeElement);
+        });
+    </script>
+    <script type="module">
+        import SliderComponentElement from '/js/SliderComponentElement.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+           'use strict';
+
+           await window.FunWithWebComponents.utils.loadHTMLTemplates([{
+               url: '/html/slider-component-template.html',
+               id: 'slider-component-template',
+           }, {
+               url: '/html/cube-element-template.html',
+               id: 'cube-element-template',
+           }]);
+
+            window.customElements.define('slider-component', SliderComponentElement);
+            await Promise.all([
+               window.customElements.whenDefined('cube-element'),
+               window.customElements.whenDefined('slider-component'),
+           ]);
+
+           function onCubeRotationInput(event) {
+               const { target } = event;
+               const { id, value } = target;
+               const propertyNameLookup = {
+                   'cube-input-xaxis': 'xaxis',
+                   'cube-input-yaxis': 'yaxis',
+                   'cube-input-zaxis': 'zaxis',
+                   'cube-input-angle': 'angle',
+               };
+               const propertyName = propertyNameLookup?.[id] ?? '';
+               if (propertyName !== '') {
+                   const parsedValue = parseInt(value, 10);
+                   const parentInputWrapper = target.closest('.cube-with-input');
+                   if (parentInputWrapper) {
+                       const cubeElement = parentInputWrapper.querySelector('cube-element');
+                       if (cubeElement) {
+                           const formattedValue = propertyName === 'angle' ? `${parsedValue}deg` : parsedValue;
+                           cubeElement.setAttribute(propertyName, formattedValue);
+                       }
+                   }
+               }
+           }
+
+           function onCubeFaceSelectionClick(event) {
+               const { target } = event;
+               const { value } = target;
+               const validValues = ['front', 'back', 'right', 'left', 'top', 'bottom'];
+               if (!validValues.includes(value)) {
+                   return;
+               }
+               const parentInputWrapper = target.closest('.cube-with-input');
+               if (parentInputWrapper) {
+                   const cubeElement = parentInputWrapper.querySelector('cube-element');
+                   if (cubeElement) {
+                       cubeElement.setAttribute('visible-face', value);
+                   }
+               }
+           }
+
+           function onCubeElementMouseWheel(event) {
+               const minZoom = 0;
+               const maxZoom = 1000;
+               const { deltaY } = event;
+               const scaleFactor = 10;
+               event.preventDefault();
+               const newScaledValue = scaleFactor * deltaY;
+
+               console.log('new scaled value ', newScaledValue);
+               console.log('deltaY ', deltaY);
+               if (newScaledValue < minZoom) {
+                   return;
+               } else if (newScaledValue > maxZoom) {
+                   return;
+               }
+               const cubeElement = document.querySelector('cube-element');
+               if (cubeElement) {
+                   const currentPerspective = cubeElement.getAttribute('perspective');
+
+                   console.log('currentPerspective', currentPerspective);
+
+                   let updatedPerspective = currentPerspective;
+                   if (currentPerspective !== null) {
+                       updatedPerspective = parseInt(currentPerspective, 10) + newScaledValue;
+                   } else {
+                       updatedPerspective = newScaledValue;
+                   }
+
+                   console.log('new perspective value ', updatedPerspective);
+                   cubeElement.setAttribute('perspective', `${updatedPerspective}`);
+               }
+
+           }
+
+           function onSliderValueChange(event) {
+               const { detail : { value } } = event;
+               const minPerspective = 0;
+               const maxPerspective = 1000;
+               // const scaledValue = value !== 0 ? (maxPerspective - minPerspective) / value : 0;
+               const scaledValue = (maxPerspective - minPerspective) / 100 * value;
+               console.log('scaled value ', scaledValue);
+               const cubeElement = document.querySelector('cube-element');
+               if (cubeElement) {
+                   cubeElement.setAttribute('perspective', `${scaledValue}px`);
+               }
+           }
+
+           const cubeInputElement = document.querySelector('.cube-input__rotation');
+           if (cubeInputElement) {
+               cubeInputElement.addEventListener('input', onCubeRotationInput);
+           }
+
+           const faceRotationInputElement = document.querySelector('.cube-input__face-selection');
+           if (faceRotationInputElement) {
+               faceRotationInputElement.addEventListener('click', onCubeFaceSelectionClick);
+           }
+
+           const sliderElement = document.querySelector('slider-component');
+           if (sliderElement) {
+               sliderElement.addEventListener('slidervaluechange', onSliderValueChange);
+           }
+
+           // const cubeElement = document.querySelector('cube-element');
+           // if (cubeElement) {
+           //     // cubeElement.addEventListener('wheel', onCubeElementMouseWheel);
+           // }
+
+
+        });
+    </script>
+</body>
+</html>
