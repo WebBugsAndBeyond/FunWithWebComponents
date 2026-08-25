@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="initial-zoom=1.0,width=device-width">
+    <meta charset="UTF-8">
+    <title>Fun With Web Components - Slider</title>
+    <style>
+        html, body, div, main, section {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-width: 100vw;
+            justify-content: flex-start;
+            align-items: start;
+            gap: 16px;
+        }
+        main > div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <template id="slider-component-template">
+        <style>
+            :host {
+                --slider-container-width-horizontal: 200px;
+                --slider-container-width-vertical: 82px;
+                --slider-container-height-horizontal: 82px;
+                --slider-container-height-vertical: 200px;
+
+                --slider-container-padding-horizontal: 10px;
+                --slider-container-padding-vertical: 25px;
+
+                --slider-track-width-horizontal: calc(var(--slider-container-width-horizontal) - (var(--slider-container-padding-horizontal) * 2));
+                --slider-track-width-vertical: 5px;
+                --slider-track-height-horizontal: 5px;
+                --slider-track-height-vertical: calc(var(--slider-container-height-vertical) - (var(--slider-container-padding-vertical) * 2));
+
+                --slider-thumb-width-horizontal: var(--slider-container-padding-horizontal);
+                --slider-thumb-width-vertical: var(--slider-container-padding-vertical);
+                --slider-thumb-height-horizontal: 20px;
+                --slider-thumb-height-vertical: 10px;
+
+                --slider-container-bg-color: lightgray;
+                --slider-track-color: rgba(0, 0, 0, 0.5);
+                --slider-thumb-color: linear-gradient(135deg, rgba(166, 166, 166, 1) 0%, rgba(200, 200, 200, 1) 100%);
+                --slider-thumb-edge-color: rgba(0, 0, 0, 0.5);
+            }
+
+            .slider__ticks {
+                position: absolute;
+            }
+
+            :host([orientation="horizontal"]) {
+                & .slider__container {
+                    width: var(--slider-container-width-horizontal);
+                    height: var(--slider-container-height-horizontal);
+                    position: relative;
+                    background: var(--slider-container-bg-color);
+                }
+                & .slider__track {
+                    position: absolute;
+                    top: var(--slider-container-padding-vertical);
+                    left: var(--slider-container-padding-horizontal);
+                    background: var(--slider-track-color);
+                    width: var(--slider-track-width-horizontal);
+                    height: var(--slider-track-height-horizontal);
+                }
+                & .slider__thumb {
+                    position: absolute;
+                    left: 0;
+                    top: calc((var(--slider-track-height-horizontal) - var(--slider-thumb-height-horizontal)) / 2);
+                    width: var(--slider-thumb-width-horizontal);
+                    height: var(--slider-thumb-height-horizontal);
+                    background: var(--slider-thumb-color);
+                    border-width: 1px;
+                    border-style: solid;
+                    border-color: var(--slider-thumb-edge-color);
+                }
+                & .slider__ticks {
+                    top: calc(var(--slider-container-padding-vertical) + var(--slider-track-height-horizontal));
+                    left: var(--slider-container-padding-horizontal);
+                    width: var(--slider-track-width-horizontal);
+                    height: var(--slider-container-padding-vertical);
+                }
+                & .slider__ticks--top {
+                    top: 0;
+                }
+                & .slider__tick {
+                    background: rgba(0, 0, 0, 0.5);
+                    width: 1px;
+                    height: calc(var(--slider-container-padding-vertical) / 2);
+                    position: absolute;
+                    top: calc(var(--slider-container-padding-vertical) / 4);
+                    left: 0;
+                }
+                & .slider__tick--0 {
+                    left: 0;
+                }
+                & .slider__tick--10 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 - 1px);
+                }
+                & .slider__tick--20 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 2 - 1px);
+                }
+                & .slider__tick--30 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 3 - 1px);
+                }
+                & .slider__tick--40 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 4 - 1px);
+                }
+                & .slider__tick--50 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 5 - 1px);
+                }
+                & .slider__tick--60 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 6 - 1px);
+                }
+                & .slider__tick--70 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 7 - 1px);
+                }
+                & .slider__tick--80 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 8 - 1px);
+                }
+                & .slider__tick--90 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 9 - 1px);
+                }
+                & .slider__tick--100 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 10 - 1px);
+                }
+                & .slider__label {
+                    position: absolute;
+                    width: var(--slider-container-width-horizontal);
+                    top: auto;
+                    bottom: 0;
+                    height: 32px;
+                    line-height: 32px;
+                    font-size: 18px;
+                    text-align: center;
+                }
+            }
+
+            :host([orientation="vertical"]) {
+                & .slider__container {
+                    width: var(--slider-container-width-vertical);
+                    height: var(--slider-container-height-vertical);
+                    position: relative;
+                    background: var(--slider-container-bg-color);
+                }
+                & .slider__track {
+                    width: var(--slider-track-width-vertical);
+                    height: var(--slider-track-height-vertical);
+                    position: absolute;
+                    top: var(--slider-container-padding-vertical);
+                    bottom: var(--slider-container-padding-vertical);
+                    left: calc((var(--slider-container-width-vertical) - var(--slider-track-width-vertical)) / 2);
+                    right: auto;
+                    background: var(--slider-track-color);
+                }
+                & .slider__thumb {
+                    position: absolute;
+                    left: calc((var(--slider-track-width-vertical) - var(--slider-thumb-width-vertical)) / 2);
+                    top: calc(var(--slider-track-height-vertical) - var(--slider-thumb-height-vertical));
+                    width: var(--slider-thumb-width-vertical);
+                    height: var(--slider-thumb-height-vertical);
+                    background: var(--slider-thumb-color);
+                    border-width: 1px;
+                    border-style: solid;
+                    border-color: rgba(0, 0, 0, 0.5);
+                }
+                & .slider__label {
+                    position: absolute;
+                    width: var(--slider-container-height-horizontal);
+                    top: auto;
+                    bottom: 0;
+                    height: 24px;
+                    line-height: 24px;
+                    font-size: 18px;
+                    text-align: center;
+                }
+
+                & .slider__tick {
+                    background: rgba(0, 0, 0, 0.5);
+                    width: calc(var(--slider-container-padding-vertical) / 2);
+                    height: 1px;
+                    position: absolute;
+                    left: -5px;
+                    top: 0;
+                }
+
+                & .slider__ticks {
+                    inset: var(--slider-container-padding-vertical);
+                    width: calc(var(--slider-container-padding-vertical) / 2);
+                    height: var(--slider-track-height-vertical);
+                }
+                & .slider__ticks:not(.slider__ticks--top) {
+                    top: var(--slider-container-padding-vertical);
+                    left: calc((var(--slider-container-padding-vertical) * 2) + var(--slider-track-width-vertical));
+                }
+                & .slider__tick--0 {
+                    top: calc(var(--slider-track-height-vertical) - 1px);
+                }
+                & .slider__tick--10 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 9 - 1px);
+                }
+                & .slider__tick--20 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 8 - 1px);
+                }
+                & .slider__tick--30 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 7 - 1px);
+                }
+                & .slider__tick--40 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 6 - 1px);
+                }
+                & .slider__tick--50 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 5 - 1px);
+                }
+                & .slider__tick--60 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 4 - 1px);
+                }
+                & .slider__tick--70 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 3 - 1px);
+                }
+                & .slider__tick--80 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 2 - 1px);
+                }
+                & .slider__tick--90 {
+                    top: calc(var(--slider-track-height-vertical) / 10 * 1 - 1px);
+                }
+                & .slider__tick--100 {
+                    top: 0;
+                }
+            }
+
+            :host([orientation="horizontal"]) {
+                & .slider__tick--0 {
+                    left: 0;
+                }
+                & .slider__tick--10 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 - 1px);
+                }
+                & .slider__tick--20 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 2 - 1px);
+                }
+                & .slider__tick--30 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 3 - 1px);
+                }
+                & .slider__tick--40 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 4 - 1px);
+                }
+                & .slider__tick--50 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 5 - 1px);
+                }
+                & .slider__tick--60 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 6 - 1px);
+                }
+                & .slider__tick--70 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 7 - 1px);
+                }
+                & .slider__tick--80 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 8 - 1px);
+                }
+                & .slider__tick--90 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 9 - 1px);
+                }
+                & .slider__tick--100 {
+                    left: calc(var(--slider-track-width-horizontal) / 10 * 10 - 1px);
+                }
+            }
+        </style>
+        <div
+            class="slider__container"
+            aria-orientation="horizontal"
+            aria-valuemax="100"
+            aria-valuemin="0"
+            aria-valuenow="0"
+            part="container"
+            tabindex="0"
+        >
+            <div class="slider__ticks slider__ticks--top">
+                <div class="slider__tick slider__tick--0"></div>
+                <div class="slider__tick slider__tick--10"></div>
+                <div class="slider__tick slider__tick--20"></div>
+                <div class="slider__tick slider__tick--30"></div>
+                <div class="slider__tick slider__tick--40"></div>
+                <div class="slider__tick slider__tick--50"></div>
+                <div class="slider__tick slider__tick--60"></div>
+                <div class="slider__tick slider__tick--70"></div>
+                <div class="slider__tick slider__tick--80"></div>
+                <div class="slider__tick slider__tick--90"></div>
+                <div class="slider__tick slider__tick--100"></div>
+            </div>
+            <div class="slider__track" part="track">
+                <div class="slider__thumb" part="thumb"></div>
+            </div>
+            <div class="slider__ticks" part="ticks">
+                <div class="slider__tick slider__tick--0"></div>
+                <div class="slider__tick slider__tick--10"></div>
+                <div class="slider__tick slider__tick--20"></div>
+                <div class="slider__tick slider__tick--30"></div>
+                <div class="slider__tick slider__tick--40"></div>
+                <div class="slider__tick slider__tick--50"></div>
+                <div class="slider__tick slider__tick--60"></div>
+                <div class="slider__tick slider__tick--70"></div>
+                <div class="slider__tick slider__tick--80"></div>
+                <div class="slider__tick slider__tick--90"></div>
+                <div class="slider__tick slider__tick--100"></div>
+            </div>
+            <div class="slider__label" id="label-text" part="label"><slot name="label">Label</slot></div>
+        </div>
+    </template>
+    <main></main>
+    <script>
+        if (
+            !Object.hasOwn(window, 'FunWithWebComponents') ||
+            typeof(window['FunWithWebComponents']) !== 'object' ||
+            window['FunWithWebComponents'] === null
+        ) {
+            window['FunWithWebComponents'] = {};
+        }
+    </script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/Shape3DCube.js"></script>
+    <script src="/js/SliderComponentElement.js" type="module"></script>
+    <script type="module">
+        import SliderComponentElement from '/js/SliderComponentElement.js';
+        window.addEventListener('load', () => {
+            const { utils : { types : { AccessibleSliderBaseElement } } } = window.FunWithWebComponents;
+            //
+            // class SliderElement extends AccessibleSliderBaseElement {
+            //
+            //     constructor(templateId = 'slider-component-template') {
+            //         super(templateId);
+            //         this.onClick = this.onClick.bind(this);
+            //     }
+            //
+            //     connectedCallback() {
+            //         super.connectedCallback();
+            //         this.addEventListener('click', this.onClick);
+            //     }
+            //
+            //     disconnectedCallback() {
+            //         super.disconnectedCallback();
+            //         this.removeEventListener('click', this.onClick);
+            //     }
+            //
+            //
+            //     onMouseMove(event) {
+            //         if (!this.isMouseDown || this.mousePosition === null) {
+            //             return;
+            //         }
+            //
+            //         window.FunWithWebComponents.utils.events.ensureEventIsOnlyHandledOnce(event);
+            //         if (this.orientation === 'horizontal') {
+            //             const isMovingRight = event.clientX > this.mousePosition.x;
+            //             const isMovingLeft = event.clientX < this.mousePosition.x;
+            //             if (isMovingRight) {
+            //                 const distance = event.clientX - this.mousePosition.x;
+            //                 const value = this.value;
+            //                 const maxValue = this.maxValue;
+            //                 this.value = Math.min(maxValue, value + distance);
+            //             } else if (isMovingLeft) {
+            //                 const distance = this.mousePosition.x - event.clientX;
+            //                 const value = this.value;
+            //                 const minValue = this.minValue;
+            //                 this.value = Math.max(minValue, value - distance);
+            //             } else {
+            //                 return;
+            //             }
+            //             this.updateMouseMoveCoordinates(event.clientX, event.clientY);
+            //         } else {
+            //             const isMovingUp = event.clientY > this.mousePosition.y;
+            //             const isMovingDown = event.clientY < this.mousePosition.y;
+            //             if (isMovingUp) {
+            //                 const value = this.value;
+            //                 const pageSize = this.pageSize;
+            //                 const maxValue = this.maxValue;
+            //                 this.value = Math.min(value + pageSize, maxValue);
+            //             } else if (isMovingDown) {
+            //                 const value = this.value;
+            //                 const pageSize = this.pageSize;
+            //                 const minValue = this.minValue;
+            //                 this.value = Math.max(value - pageSize, minValue);
+            //             } else {
+            //                 return;
+            //             }
+            //             this.updateMouseMoveCoordinates(event.clientX, event.clientY);
+            //         }
+            //         this.selfSetAttribute('value', this.value);
+            //         this.updateUIValueDisplay();
+            //     }
+            //
+            //     onClick(event) {
+            //         window.FunWithWebComponents.utils.events.ensureEventIsOnlyHandledOnce(event);
+            //         const thumbElement = this.shadowRoot.querySelector('.slider__thumb');
+            //         if (thumbElement) {
+            //             const thumbLeft = parseInt(thumbElement.style.left, 10);
+            //             const thumbTop = parseInt(thumbElement.style.top, 10);
+            //             if (this.orientation === 'vertical') {
+            //                 const trackElement = this.shadowRoot.querySelector('.slider__track');
+            //                 const trackHeightEventYOffset = (trackElement.offsetHeight + trackElement.offsetTop) - event.offsetY;
+            //
+            //                 if (trackHeightEventYOffset < thumbTop) {
+            //                     // Increase value by page size.
+            //                     const value = this.value;
+            //                     const pageSize = this.pageSize;
+            //                     const maxValue = this.maxValue;
+            //                     this.value = Math.min(value + pageSize, maxValue);
+            //                 } else if (trackHeightEventYOffset > thumbTop) {
+            //                     // Decrease value by page size.
+            //                     const value = this.value;
+            //                     const pageSize = this.pageSize;
+            //                     const minValue = this.minValue;
+            //                     this.value = Math.max(value - pageSize, minValue);
+            //                 }
+            //             } else {
+            //                 if (event.offsetX > thumbLeft) {
+            //                     // Increase value by page size.
+            //                     const value = this.value;
+            //                     const pageSize = this.pageSize;
+            //                     const maxValue = this.maxValue;
+            //                     this.value = Math.min(value + pageSize, maxValue);
+            //                 } else if (event.offsetX < thumbLeft) {
+            //                     // Decrease value by page size
+            //                     const value = this.value;
+            //                     const pageSize = this.pageSize;
+            //                     const minValue = this.minValue;
+            //                     this.value = Math.max(value - pageSize, minValue);
+            //                 }
+            //             }
+            //         }
+            //     }
+            //
+            //     updateUIValueDisplay() {
+            //         if (!this.isConnected) {
+            //             return;
+            //         }
+            //         const thumbElement = this.shadowRoot.querySelector('.slider__thumb');
+            //
+            //         if (thumbElement) {
+            //             const trackElement = this.shadowRoot.querySelector('.slider__track');
+            //             if (trackElement) {
+            //                 const trackDistance = this.orientation === 'vertical' ? trackElement.clientHeight : trackElement.clientWidth;
+            //                 const { value, minValue, maxValue, } = this;
+            //                 const sliderValueRange = maxValue - minValue;
+            //                 const steps = trackDistance / sliderValueRange;
+            //                 const valueSteps = value * steps;
+            //
+            //                 if (this.orientation === 'vertical') {
+            //                     thumbElement.style.top = `${trackDistance - valueSteps}px`;
+            //                     console.log(`Thumb top: ${thumbElement.style.top}`);
+            //                 } else {
+            //                     thumbElement.style.left = `${valueSteps}px`;
+            //                     console.log(`Thumb left: ${thumbElement.style.left}`);
+            //                 }
+            //                 this.selfSetAttribute('value', value);
+            //             }
+            //         }
+            //     }
+            // }
+
+            function createTestHorizontalSliderElement(mainElement) {
+                const sliderElement = document.createElement('slider-component');
+                sliderElement.setAttribute('orientation', window.FunWithWebComponents.utils.types.AccessibleSliderBaseElement.HORIZONTAL_ORIENTATION);
+                sliderElement.setAttribute('value', '30');
+                sliderElement.setAttribute('label', 'Volume');
+
+                const sliderInputWrapper = document.createElement('div');
+                sliderInputWrapper.appendChild(sliderElement);
+                // mainElement.appendChild(sliderElement);
+                const inputElement = createTestHorizontalSliderValueInputElement(sliderElement);
+                sliderElement.addEventListener('slidervaluechange', (event) => {
+                   const { detail : { value } } = event;
+                   if (!Number.isNaN(value)) {
+                       if (Number.isNaN(inputElement) || (inputElement.value !== value)) {
+                           inputElement.value = value;
+                       }
+                   }
+                });
+                sliderInputWrapper.appendChild(inputElement);
+                mainElement.appendChild(sliderInputWrapper);
+                return sliderInputWrapper;
+            }
+
+            function createTestVerticalSliderElement(mainElement) {
+                const sliderElement = document.createElement('slider-component');
+                sliderElement.setAttribute('orientation', 'vertical');
+                sliderElement.setAttribute('value', '90');
+                sliderElement.setAttribute('label', 'Bass');
+
+                const sliderInputWrapper = document.createElement('div');
+                sliderInputWrapper.appendChild(sliderElement);
+                // mainElement.appendChild(sliderElement);
+
+                const inputElement = createTestVerticalSliderValueInputElement(sliderElement);
+                sliderElement.addEventListener('slidervaluechange', (event) => {
+                    const { detail : { value } } = event;
+                    if (!Number.isNaN(value)) {
+                        if (Number.isNaN(inputElement.value) || (value !== inputElement.value)) {
+                            inputElement.value = value;
+                        }
+                    }
+                });
+                sliderInputWrapper.appendChild(inputElement);
+                mainElement.appendChild(sliderInputWrapper);
+                return sliderInputWrapper;
+
+            }
+
+            function createTestHorizontalSliderValueInputElement(sliderElement) {
+                const inputElement = document.createElement('input');
+                inputElement.setAttribute('type', 'number');
+                inputElement.setAttribute('min', sliderElement.getAttribute('minvalue'));
+                inputElement.setAttribute('max', sliderElement.getAttribute('maxvalue'));
+                inputElement.setAttribute('step', '1');
+                inputElement.setAttribute('size', 3);
+                inputElement.addEventListener('change', (event) => {
+                    const target = event.target;
+                    const value = target.value;
+                    sliderElement.setAttribute('value', value);
+                });
+                return inputElement;
+            }
+
+            function createTestVerticalSliderValueInputElement(sliderElement) {
+                const inputElement = document.createElement('input');
+                inputElement.setAttribute('type', 'number');
+                inputElement.setAttribute('min', sliderElement.getAttribute('minvalue'));
+                inputElement.setAttribute('max', sliderElement.getAttribute('maxvalue'));
+                inputElement.setAttribute('step', '1');
+                inputElement.setAttribute(
+                    'size',
+                    Math.max(
+                        sliderElement.getAttribute('minvalue')?.length ?? 3,
+                        sliderElement.getAttribute('maxvalue')?.length ?? 3
+                    ) + ''
+                );
+                inputElement.addEventListener('change', (event) => {
+                    const target = event.target;
+                    const value = target.value;
+                    sliderElement.setAttribute('value', value);
+                });
+                return inputElement;
+            }
+
+
+            function wireUpSliderEventsToCubeRotation() {
+                const mainElement = document.querySelector('main');
+                if (!mainElement) {
+                    console.error('No main element found in document.');
+                    return;
+                }
+
+                const cubeElement = document.querySelector('shape3d-cube');
+                if (!cubeElement) {
+                    console.error('No shape3d-cube element found in document.');
+                    return;
+                }
+                mainElement.addEventListener('slidervaluechange', (event) => {
+                    const { detail : { value }, target } = event;
+                    console.log(target);
+                    const sliderElement = event.composedPath().find(element => element.tagName === 'SLIDER-COMPONENT');
+                    if (sliderElement) {
+                        const orientation = sliderElement.getAttribute('orientation');
+                        if (orientation === null) {
+                            console.log('Slider orientation not known.');
+                            return;
+                        }
+                        const minValue = sliderElement.getAttribute('minvalue');
+                        if (minValue === null) {
+                            console.log('Slider min value not known.');
+                            return;
+                        }
+                        const maxValue = sliderElement.getAttribute('maxvalue');
+                        if (maxValue === null) {
+                            console.log('Slider max value not known');
+                            return;
+                        }
+                        const sliderRange = parseFloat(maxValue) - parseFloat(minValue);
+                        const percentage = parseFloat(value) / sliderRange;
+                        const rotationRange = 360;
+                        const rotationValue = Math.floor((rotationRange * percentage) - (rotationRange / 2));
+
+                        if (orientation === 'horizontal') {
+                            cubeElement.rotateOnYAxis(`${rotationValue}deg`);
+                        } else if (orientation === 'vertical') {
+                            cubeElement.rotateOnXAxis(`${rotationValue}deg`);
+                        }
+                    }
+
+                });
+            }
+
+            async function initializeCustomElements() {
+                window.customElements.define('slider-component', SliderComponentElement);
+                window.customElements.define('shape3d-cube', window.FunWithComponents.types.Shape3DCubeElement);
+
+                await Promise.all([
+                    window.customElements.whenDefined('slider-component'),
+                    window.FunWithWebComponents.utils.loadHTMLTemplates([{
+                        url: '/html/cube-element-template.html',
+                        id: 'cube-element-template',
+                    }]),
+                    window.customElements.whenDefined('shape3d-cube'),
+                ]);
+                const mainElement = document.querySelector('main');
+                if (mainElement) {
+                    createTestHorizontalSliderElement(mainElement);
+                    createTestVerticalSliderElement(mainElement);
+
+                    const cubeElement = document.createElement('shape3d-cube');
+                    mainElement.appendChild(cubeElement);
+
+                    wireUpSliderEventsToCubeRotation();
+                }
+            }
+            initializeCustomElements().then(() => {
+                console.log('Custom elements are initialized.');
+            }).catch(error => {
+                console.error("An error occurred initializing custom elements.");
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>

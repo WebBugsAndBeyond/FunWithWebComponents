@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fun With Web Components - Resr</title>
+</head>
+<body>
+    <main></main>
+    <script>window.FunWithWebComponents = {};</script>
+    <script src="/js/utils.js" type="text/javascript"></script>
+    <script src="/js/resr.js" type="text/javascript"></script>
+    <script type="module">
+        import SliderComponentElement from "./js/SliderComponentElement.js";
+        import RotatingKnobElement from "./js/RotatingKnobElement.js";
+
+        function initializeRotatingKnobComponent() {
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                const knobElement = document.createElement('rotating-knob');
+                mainElement.appendChild(knobElement);
+                knobElement.setAttribute('label', 'Bass');
+
+                const inputElement = document.createElement('input');
+                inputElement.setAttribute('type', 'number');
+                inputElement.setAttribute('min', '0');
+                inputElement.setAttribute('max', '100');
+                inputElement.setAttribute('step', '1');
+                inputElement.setAttribute('size', 3);
+                inputElement.addEventListener('input', (event) => {
+                    const target = event.target;
+                    const value = target.value;
+                    if (!isNaN(value) && Number(value) !== knobElement.value) {
+                        knobElement.setAttribute('value', value);
+                    }
+                });
+                mainElement.appendChild(inputElement);
+                knobElement.addEventListener('slidervaluechange', (event) => {
+                    const { detail : { value } } = event;
+                    if (value !== inputElement.value) {
+                        inputElement.value = value;
+                    }
+                });
+            }
+        }
+
+        function createTestHorizontalSliderElement(mainElement) {
+            const sliderElement = document.createElement('slider-component');
+            sliderElement.setAttribute('orientation', window.FunWithWebComponents.utils.types.AccessibleSliderBaseElement.HORIZONTAL_ORIENTATION);
+            sliderElement.setAttribute('value', '30');
+            sliderElement.setAttribute('label', 'Volume');
+
+            const sliderInputWrapper = document.createElement('div');
+            sliderInputWrapper.appendChild(sliderElement);
+            // mainElement.appendChild(sliderElement);
+            const inputElement = createTestHorizontalSliderValueInputElement(sliderElement);
+            sliderElement.addEventListener('slidervaluechange', (event) => {
+                const { detail : { value } } = event;
+                if (!Number.isNaN(value)) {
+                    if (Number.isNaN(inputElement) || (inputElement.value !== value)) {
+                        inputElement.value = value;
+                    }
+                }
+            });
+            sliderInputWrapper.appendChild(inputElement);
+            mainElement.appendChild(sliderInputWrapper);
+            return sliderInputWrapper;
+        }
+
+        function createTestVerticalSliderElement(mainElement) {
+            const sliderElement = document.createElement('slider-component');
+            sliderElement.setAttribute('orientation', 'vertical');
+            sliderElement.setAttribute('value', '90');
+            sliderElement.setAttribute('label', 'Bass');
+
+            const sliderInputWrapper = document.createElement('div');
+            sliderInputWrapper.appendChild(sliderElement);
+            // mainElement.appendChild(sliderElement);
+
+            const inputElement = createTestVerticalSliderValueInputElement(sliderElement);
+            sliderElement.addEventListener('slidervaluechange', (event) => {
+                const { detail : { value } } = event;
+                if (!Number.isNaN(value)) {
+                    if (Number.isNaN(inputElement.value) || (value !== inputElement.value)) {
+                        inputElement.value = value;
+                    }
+                }
+            });
+            sliderInputWrapper.appendChild(inputElement);
+            mainElement.appendChild(sliderInputWrapper);
+            return sliderInputWrapper;
+
+        }
+
+        function createTestHorizontalSliderValueInputElement(sliderElement) {
+            const inputElement = document.createElement('input');
+            inputElement.setAttribute('type', 'number');
+            inputElement.setAttribute('min', sliderElement.getAttribute('minvalue'));
+            inputElement.setAttribute('max', sliderElement.getAttribute('maxvalue'));
+            inputElement.setAttribute('step', '1');
+            inputElement.setAttribute('size', 3);
+            inputElement.addEventListener('change', (event) => {
+                const target = event.target;
+                const value = target.value;
+                sliderElement.setAttribute('value', value);
+            });
+            return inputElement;
+        }
+
+        function createTestVerticalSliderValueInputElement(sliderElement) {
+            const inputElement = document.createElement('input');
+            inputElement.setAttribute('type', 'number');
+            inputElement.setAttribute('min', sliderElement.getAttribute('minvalue'));
+            inputElement.setAttribute('max', sliderElement.getAttribute('maxvalue'));
+            inputElement.setAttribute('step', '1');
+            inputElement.setAttribute(
+                'size',
+                Math.max(
+                    sliderElement.getAttribute('minvalue')?.length ?? 3,
+                    sliderElement.getAttribute('maxvalue')?.length ?? 3
+                ) + ''
+            );
+            inputElement.addEventListener('change', (event) => {
+                const target = event.target;
+                const value = target.value;
+                sliderElement.setAttribute('value', value);
+            });
+            return inputElement;
+        }
+
+        function initializeHorizontalSliderComponent() {
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                createTestHorizontalSliderElement(mainElement);
+            }
+        }
+
+        function initializeVerticalSliderComponent() {
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                createTestVerticalSliderElement(mainElement);
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loadedTemplateElements = await window.FunWithWebComponents.utils.loadHTMLTemplates([{
+                url: '/html/rotating-knob-template.html',
+                id: 'rotating-knob-template',
+            }, {
+                url: '/html/slider-component-template.html',
+                id: 'slider-component-template',
+            }], 'body');
+
+            window.customElements.define('rotating-knob', RotatingKnobElement);
+            window.customElements.define('slider-component', SliderComponentElement);
+            const constructors = await Promise.all([
+                window.customElements.whenDefined('rotating-knob'),
+                window.customElements.whenDefined('slider-component'),
+            ]);
+            initializeRotatingKnobComponent();
+            initializeHorizontalSliderComponent();
+            initializeVerticalSliderComponent();
+        });
+    </script>
+</body>
+</html>

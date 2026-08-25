@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="initial-scale=1.0,width=device-width">
+    <meta charset="UTF-8">
+    <title>Cube Profile Redux</title>
+    <style>
+        body {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+        main {
+            background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%);
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+  <main>
+    <cube-element id="profile-cube"
+            size="700px"
+            xaxis="0"
+            yaxis="0"
+            zaxis="0"
+            perspective="2000px"
+            visible-face="front"
+    ></cube-element>
+  </main>
+  <script>
+    window.FunWithWebComponents = window.FunWithWebComponents || {};
+  </script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/CubeElement.js" type="module"></script>
+  <script type="module">
+
+    import CubeElement from "/js/CubeElement.js";
+    import ProfilePageElement from "/js/ProfilePageElement.js";
+
+    document.addEventListener('DOMContentLoaded', async function(){
+      'use strict';
+
+      function initializeCubeSizeBasedOnWindowSize() {
+          const { innerWidth, innerHeight } = window;
+          const MAX_WIDTH = 700;
+          const cubeSize = Math.min(innerWidth, innerHeight, MAX_WIDTH);
+          const cubeElement = document.getElementById('profile-cube');
+          cubeElement.setAttribute('size', `${cubeSize}px`);
+          // const perspective = cubeSize * 2;
+          // cubeElement.setAttribute('perspective', `${perspective}px`);
+      }
+
+      await window.FunWithWebComponents.utils.loadHTMLTemplates(([
+        {
+          url: '/html/cube-element-template.html',
+          id: 'cube-element-template',
+        },
+        {
+          url: '/html/profile-page.html',
+          id: 'profile-page-template',
+        }
+      ]));
+      window.customElements.define('cube-element', CubeElement);
+      window.customElements.define('profile-page-element', ProfilePageElement);
+
+      await Promise.all([
+        window.customElements.whenDefined('cube-element'),
+        window.customElements.whenDefined('profile-page-element'),
+      ]);
+
+      const response = await fetch('/mock/cube-profile-redux.json');
+      const responseJson = await response.json();
+      const cubeElement = document.getElementById('profile-cube');
+
+      Object.entries(responseJson).forEach(([key, value]) => {
+        const profilePageElement = document.createElement('profile-page-element');
+        const headerHtml = value.header;
+        const contentHtml = value.content;
+        const aside = value.aside;
+        let asideHtml = '';
+        if (typeof aside.list !== 'undefined' && Array.isArray(aside.list)) {
+          const listItems = aside.list.map(({ url, text }) => {
+            const li = document.createElement('li');
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.textContent = text;
+            li.appendChild(anchor);
+            return li;
+          });
+          const ul = document.createElement('ul');
+          ul.append(...listItems);
+          asideHtml = ul.outerHTML;
+        }
+        profilePageElement.header = headerHtml;
+        profilePageElement.content = contentHtml;
+        profilePageElement.sidebar = asideHtml;
+        profilePageElement.setAttribute('slot', key);
+        cubeElement.appendChild(profilePageElement);
+      });
+
+      initializeCubeSizeBasedOnWindowSize();
+      window.addEventListener('resize', initializeCubeSizeBasedOnWindowSize);
+    });
+  </script>
+</body>
+</html>
