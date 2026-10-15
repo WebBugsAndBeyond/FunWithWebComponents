@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fun With Audio Oscillators</title>
+</head>
+<body>
+<main>
+    <h1>Fun With Audio Oscillators</h1>
+    <section id="oscillator-sliders" class="oscillator--sliders">
+        <div class="oscillator--sliders--slider oscillator__20hz-to-200hz">
+            <slider-component
+                orientation="vertical"
+                minvalue="20"
+                maxvalue="200"
+                label="Low"
+                value="100"
+                pagesize="10"
+                id="20hzTo200hz-frequency-slider"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="20hzTo200hz"
+            ></slider-component>
+            <rotating-knob-component
+                id="20hz-to-200hz-frequency-volume-knob"
+                minvalue="0"
+                maxvalue="100"
+                pagesize="10"
+                label="Volume"
+                data-oscillatorproperty="amplitude"
+                data-oscillatorid="20hzTo200hz"
+            ></rotating-knob-component>
+        </div>
+        <div class="oscillator--sliders--slider oscillator__201hz-to-500hz">
+            <slider-component
+                id="201hz-to-500hz-mid-frequency-slider"
+                orientation="vertical"
+                minvalue="201"
+                maxvalue="500"
+                label="201hz - 500hz"
+                value="440"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="201hzTo500hz"
+            ></slider-component>
+            <rotating-knob-component
+                id="201hz-to-500hz-frequency-volume-knob"
+                minvalue="0"
+                maxvalue="100"
+                pagesize="10"
+                label="Volume"
+                data-oscillatorproperty="amplitude"
+                data-oscillatorid="201hzTo500hz"
+            ></rotating-knob-component>
+        </div>
+        <div class="oscillator--sliders--slider oscillator__501hz-to-1000hz">
+            <slider-component
+                id="501hz-to-1000hz-frequency-slider"
+                orientation="vertical"
+                minvalue="501"
+                maxvalue="1000"
+                label="High Mid"
+                value="750"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="501hzTo1000hz"
+            ></slider-component>
+            <rotating-knob-component
+                id="501hz-to-1000hz-frequency-volume-knob"
+                minvalue="0"
+                maxvalue="100"
+                pagesize="10"
+                label="Volume"
+                data-oscillatorproperty="amplitude"
+                data-oscillatorid="501hzTo1000hz"
+            ></rotating-knob-component>
+        </div>
+        <div class="oscillator--sliders--slider oscillator__1001-to-2000hz">
+            <slider-component
+                orientation="vertical"
+                minvalue="1001"
+                maxvalue="2000"
+                label="High"
+                value="1001"
+                pagesize="100"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="1001hzTo2000hz"
+            ></slider-component>
+            <rotating-knob-component
+                id="1001hz-to-2000hz-frequency-volume-knob"
+                minvalue="0"
+                maxvalue="100"
+                pagesize="10"
+                label="Volume"
+                data-oscillatorproperty="amplitude"
+                data-oscillatorid="1001hzTo2000hz"
+            ></rotating-knob-component>
+        </div>
+        <div class="oscillator--sliders--slider oscillator__2001hz-to-3000hz">
+            <slider-component
+                id="2001hz-to-3000hz-frequency-volume-knob"
+                orientation="vertical"
+                minvalue="2001"
+                maxvalue="3000"
+                label="Higher"
+                value="2001"
+                pagesize="10"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="2001hzTo3000hz"
+            ></slider-component>
+        </div>
+        <div class="oscillator--sliders--slider oscillator__3001hz-to-4000hz">
+            <slider-component
+                id="3001hz-to-4000hz-frequency-slider"
+                orientation="vertical"
+                minvalue="3001"
+                maxvalue="4000"
+                value="3500"
+                label="3001hz - 4000hz"
+                pagesize="100"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="3001hzTo4000hz"
+            ></slider-component>
+            <rotating-knob-component
+                id="3001hz-to-4000hz-frequency-volume-knob"
+                minvalue="0"
+                maxvalue="100"
+                pagesize="10"
+                label="Volume"
+                value="0"
+                data-oscillatorproperty="amplitude"
+                data-oscillatorid="3001hzTo4000hz"
+            ></rotating-knob-component>
+        </div>
+        <div class="oscillator--sliders--slider oscillator__4001hz-to-5000hz">
+            <slider-component
+                orientation="vertical"
+                minvalue="4001"
+                maxvalue="5000"
+                label="4001hz - 5000hz"
+                value="4500"
+                pagesize="100"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="4001hzTo5000hz"
+            >
+            </slider-component>
+            <rotating-knob-component
+                id="4001hz-to-5000hz-frequency-volume-knob"
+                minvalue="0"
+                maxvalue="100"
+                pagesize="10"
+                label="Volume"
+                value="0"
+                data-oscillatorproperty="amplitude"
+                data-oscillatorid="4001hzTo5000hz"
+            ></rotating-knob-component>
+        </div>
+        <div class="oscillator--sliders--slider oscillator__5001hz-to-6000hz">
+            <slider-component
+                id="5001hz-to-1000hz-frequency-slider"
+                orientation="vertical"
+                minvalue="5001"
+                maxvalue="6000"
+                pagesize="100"
+                label="Volume"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="5001hzTo6000hz"
+            ></slider-component>
+            <rotating-knob-component
+                id="5001hz-to-1000hz-frequency-volume-knob"
+                minvalue="0"
+                maxvalue="100"
+                pagesize="10"
+                label="Volume"
+                value="0"
+                data-oscillatorproperty="frequency"
+                data-oscillatorid="5001hzTo6000hz"
+            ></rotating-knob-component>
+        </div>
+    </section>
+</main>
+    <script>
+        window.FunWithWebComponents = window.FunWithWebComponents || {}
+    </script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/SliderComponentElement.js" type="module"></script>
+    <script type="module">
+        import { AccessibleSliderBaseElement } from '/js/base-types.js';
+        import SliderComponentElement from '/js/SliderComponentElement.js';
+        import RotatingKnobElement from "./js/RotatingKnobElement.js";
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loadedHtmlElements = await window.FunWithWebComponents.utils.loadHTMLTemplates([{
+                url: '/html/rotating-knob-template.html',
+                id: 'rotating-knob-template',
+            }, {
+                url: '/html/slider-component-template.html',
+                id: 'slider-component-template',
+            }]);
+            console.debug(loadedHtmlElements);
+            window.customElements.define('rotating-knob-component', RotatingKnobElement);
+            window.customElements.define('slider-component', SliderComponentElement);
+            await Promise.all([
+                window.customElements.whenDefined('slider-component'),
+            ]);
+
+            const MIN_AUDIBLE_FREQUENCY = 20;
+            const MAX_AUDIBLE_FREQUENCY = 20000;
+            const oscillatorState = {
+                audioContext: null,
+                '20hzTo200hz': {
+                    frequency: 100,
+                    volume: 0,
+                    oscillator: null,
+                    gain: null,
+                },
+                '201hzTo500hz': {
+                    frequency: 350,
+                    volume: 0,
+                    oscillator: null,
+                    gain: null,
+                },
+                '501hzTo1000hz': {
+                    frequency: 750,
+                    volume: 0,
+                    oscillator: null,
+                    gain: null,
+                },
+                '1001hzTo2000hz': {
+                    frequency: 1500,
+                    volume: 0,
+                    oscillator: null,
+                    gain: null,
+                },
+                '2001hzTo3000hz': {
+                    frequency: 2500,
+                    volume: 0,
+                    oscillator: null,
+                    gain: null,
+                },
+                '3001hzTo4000hz': {
+                    frequency: 3500,
+                    volume: 0,
+                    oscillator: null,
+                    gain: null,
+                },
+                '4001hzTo5000hz': {
+                    frequency: 4500,
+                    volume: 0,
+                    oscillator: null,
+                    gain: null,
+                },
+                '5001hzTo6000hz': {
+                    frequency: 5500,
+                    volume: 0,
+                    oscillator: null,
+                    gain: null,
+                },
+            };
+
+            function updateOscillatorFrequency({ id, frequency = NaN, volume = NaN }) {
+                const state = oscillatorState[id];
+                if (!state) {
+                    return;
+                }
+                const oscillatorIsRunning = state.volume > 0;
+                if (!isNaN(frequency) && frequency >= MIN_AUDIBLE_FREQUENCY && frequency <= MAX_AUDIBLE_FREQUENCY) {
+                    state.frequency = frequency;
+                }
+                if (!isNaN(volume) && volume >= 0 && volume <= 1) {
+                    state.volume = volume;
+                }
+                state.oscillator.frequency.value = frequency;
+                if (state.volume !== 0) {
+                    state.gain.gain.setValueAtTime(oscillatorState.audioContext.currentTime, volume / 100);
+                    if (!oscillatorIsRunning) {
+                        state.oscillator.start(oscillatorState.audioContext.currentTime);
+                    }
+                } else {
+                    state.oscillator.stop();
+                }
+            }
+
+            const oscillatorSliders = document.querySelector('#oscillator-sliders');
+            if (oscillatorSliders) {
+                oscillatorSliders.addEventListener('slidervaluechange', e => {
+                    if (e.composed) {
+                        const composedPath = e.composedPath();
+                        const sliderElement = composedPath.find(element => element instanceof AccessibleSliderBaseElement);
+                        if (sliderElement) {
+                            const sliderId = sliderElement.getAttribute('id');
+                            const { detail : { value = NaN } = {} } = e;
+                            const isVolumeKnob = sliderElement instanceof RotatingKnobElement;
+                            if (!isNaN(value)) {
+                                if (isVolumeKnob) {
+                                    updateOscillatorFrequency({ id: sliderId, volume: value });
+                                } else {
+                                    updateOscillatorFrequency({ id: sliderId, frequency: value });
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

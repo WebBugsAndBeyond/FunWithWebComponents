@@ -23,6 +23,7 @@ const server = http.createServer((req, res) => {
             '/resr.html',
             '/cube.html',
             '/cube-profile-redux.html',
+            '/single-oscillator.html',
         ],
         js: [
             '/js/base-types.js',

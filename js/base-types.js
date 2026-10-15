@@ -140,8 +140,7 @@ export class AccessibleSliderBaseElement extends ShadowDOMBaseElement {
                 this.#maxValue = newValue;
             }
         } else if (
-            name === 'pagesize' &&
-            this.#pageSize !== parseFloat(newValue)
+            name === 'pagesize'
         ) {
             const parsedNumberValue = parseFloat(newValue);
             if (window.FunWithWebComponents.utils.types.number.isFactorOf(parsedNumberValue, (this.#maxValue - this.#minValue))) {
@@ -176,12 +175,36 @@ export class AccessibleSliderBaseElement extends ShadowDOMBaseElement {
         this.addEventListener('keydown', this.onKeyDown);
         this.addEventListener('keyup', this.onKeyUp);
         this.#debounceAttributeValueUpdate = true;
-        this.setAttribute('value', this.#value + '');
-        this.setAttribute('minvalue', this.#minValue + '');
-        this.setAttribute('maxvalue', this.#maxValue + '');
-        this.setAttribute('pagesize', this.#pageSize + '');
-        this.setAttribute('label', this.#labelText);
-        this.setAttribute('orientation', this.#orientation);
+        if (!this.hasAttribute('value')) {
+            this.setAttribute('value', this.#value + '');
+        } else {
+            this.#value = parseFloat(this.getAttribute('value'));
+        }
+        if (!this.hasAttribute('minvalue')) {
+            this.setAttribute('minvalue', this.#minValue + '');
+        } else {
+            this.#minValue = parseFloat(this.getAttribute('minvalue'));
+        }
+        if (!this.hasAttribute('maxvalue')) {
+            this.setAttribute('maxvalue', this.#maxValue + '');
+        } else {
+            this.#maxValue = parseFloat(this.getAttribute('maxvalue'));
+        }
+        if (!this.hasAttribute('pagesize')) {
+            this.setAttribute('pagesize', this.#pageSize + '');
+        } else {
+            this.#pageSize = parseFloat(this.getAttribute('pagesize'));
+        }
+        if (!this.hasAttribute('label')) {
+            this.setAttribute('label', this.#labelText);
+        } else {
+            this.#labelText = this.getAttribute('label');
+        }
+        if (!this.hasAttribute('orientation')) {
+            this.setAttribute('orientation', this.#orientation);
+        } else {
+            this.#orientation = this.getAttribute('orientation');
+        }
         this.#debounceAttributeValueUpdate = false;
         this.updateUIValueDisplay();
         this.updateUILabelDisplay();
@@ -196,6 +219,9 @@ export class AccessibleSliderBaseElement extends ShadowDOMBaseElement {
     }
 
     onMouseDown(event) {
+        if (event.button !== 0) {
+            return;
+        }
         window.FunWithWebComponents.utils.events.ensureEventIsOnlyHandledOnce(event);
         this.#isMouseDown = true;
         this.#mousePosition = {
@@ -204,6 +230,8 @@ export class AccessibleSliderBaseElement extends ShadowDOMBaseElement {
         };
         console.log('onMouseDown');
         console.log(this.#mousePosition);
+        this.setAttribute('tabindex', '0');
+        this.focus();
     }
 
     onMouseUp(event) {

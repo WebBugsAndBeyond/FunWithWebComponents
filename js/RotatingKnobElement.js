@@ -13,7 +13,7 @@ export default class RotatingKnobElement extends AccessibleSliderBaseElement {
         if (!this.isMouseDown) {
             return;
         }
-        window.FunWithWebComponents.utils.event.ensureEventIsOnlyHandledOnce(event);
+        window.FunWithWebComponents.utils.events.ensureEventIsOnlyHandledOnce(event);
         const { mousePosition, value, pageSize, minValue, maxValue } = this;
         const mouseX = event.clientX;
         const mouseY = event.clientY;

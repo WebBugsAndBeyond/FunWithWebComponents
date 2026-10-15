@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fun With Web Components - Single Oscillator</title>
+</head>
+<body>
+  <main>
+    <div>
+      <label for="waveType">Waveform Type</label>
+      <select id="waveType">
+        <option value="sine">Sine</option>
+        <option value="square">Square</option>
+        <option value="triangle">Triangle</option>
+        <option value="sawtooth">Sawtooth</option>
+      </select>
+      <button id="start-stop-toggle">Start</button>
+    </div>
+    <div id="volume-container">
+
+    </div>
+  </main>
+  <script>
+    window.FunWithWebComponents = window.FunWithWebComponents || {};
+  </script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/RotatingKnobElement.js" type="module"></script>
+  <script type="module">
+    import RotatingKnobElement from '/js/RotatingKnobElement.js';
+
+    async function defineCustomElements(elementsSpec) {
+      const templateLoadSpec = elementsSpec.map(({ templateUrl, templateId }) => ({
+        url: templateUrl,
+        id: templateId,
+      }));
+      const loadedTemplates = await window.FunWithWebComponents.utils.loadHTMLTemplates(templateLoadSpec);
+      elementsSpec.forEach(({ tagName, elementClass }) => {
+        window.customElements.define(tagName, elementClass);
+      });
+      const definedElementsConstructors = await Promise.all(elementsSpec.map(({ tagName }) => window.customElements.whenDefined(tagName)));
+      return {
+        loadedTemplates,
+        definedElementsConstructors,
+      };
+    }
+
+    function createOscillator(
+      audioContext,
+      frequency,
+      gainNode,
+      type,
+    ) {
+      const oscillator =  audioContext.createOscillator();
+      oscillator.connect(gainNode);
+      oscillator.frequency.value = frequency;
+      oscillator.type = type;
+      return oscillator;
+    }
+
+    function createVolumeKnob(id) {
+      const knobElement = document.createElement('rotating-knob');
+      knobElement.setAttribute('id', id);
+      knobElement.setAttribute('minvalue', '0');
+      knobElement.setAttribute('maxvalue', '100');
+      knobElement.setAttribute('value', '50');
+      knobElement.setAttribute('pagesize', '5');
+      knobElement.setAttribute('label', 'Volume');
+      return knobElement;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+
+      const customElementsDefinitions = await defineCustomElements([{
+        tagName: 'rotating-knob',
+        templateUrl: '/html/rotating-knob-template.html',
+        templateId: 'rotating-knob-template',
+        elementClass: RotatingKnobElement,
+      }]);
+      const { loadedTemplates, definedElementsConstructors } = customElementsDefinitions;
+      console.debug(`Custom elements defined`);
+      loadedTemplates.forEach(({ url, id, templateElement }) => {
+        console.debug(`Loaded template ${id} from url ${url}`);
+        console.debug(templateElement);
+      });
+      definedElementsConstructors.forEach(({ elementClass }) => {
+        console.debug(elementClass);
+      });
+
+      const state = {
+        audioContext: null,
+        gainNode: null,
+        oscillator: null,
+        isPlaying: false,
+        initializeContext() {
+          if (this.audioContext === null) {
+            this.audioContext = new AudioContext();
+            this.gainNode = this.audioContext.createGain();
+            this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+            this.gainNode.connect(this.audioContext.destination);
+          }
+        }
+      };
+
+      const startStopToggleButton = document.querySelector('#start-stop-toggle');
+      if (startStopToggleButton) {
+        startStopToggleButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          if (state.isRunning) {
+            state.isRunning = false;
+            state.oscillator.stop();
+            state.oscillator = null;
+            startStopToggleButton.textContent = 'Start';
+          } else {
+            state.initializeContext();
+            state.isRunning = true;
+            const waveTypeValue = document.getElementById("waveType")?.value ?? 'sine';
+            state.oscillator = createOscillator(state.audioContext, 440, state.gainNode, waveTypeValue);
+            state.oscillator.start();
+            startStopToggleButton.textContent = 'Stop';
+            const now = state.audioContext.currentTime;
+            state.gainNode.gain.exponentialRampToValueAtTime(0.1, now + 1);
+          }
+        });
+      }
+
+      const volumeContainer = document.querySelector('#volume-container');
+      if (volumeContainer) {
+        const volumeKnobId = 'volumeKnob';
+        const volumeKnobElement = createVolumeKnob(volumeKnobId);
+        volumeContainer.appendChild(volumeKnobElement);
+        volumeKnobElement.addEventListener('slidervaluechange', (event) => {
+          const { detail : { value } } = event;
+          console.debug(`Volume change: ${value}`);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
